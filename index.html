@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Spider Robot Controller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <header class="app-header">
+      <div class="logo-group">
+        <div class="logo-icon"><span class="material-icons-round">smart_toy</span></div>
+        <div>
+          <h1>SPIDER ROBOT</h1>
+          <p class="subtitle">Wireless Controller</p>
+        </div>
+      </div>
+      <div class="status-group">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Disconnected</span>
+      </div>
+    </header>
+
+    <div class="tab-bar">
+      <button class="tab active" data-tab="control" onclick="switchTab('control')">
+        <span class="material-icons-round">gamepad</span>Controls
+      </button>
+      <button class="tab" data-tab="camera" onclick="switchTab('camera')">
+        <span class="material-icons-round">videocam</span>Camera
+      </button>
+      <button class="tab" data-tab="settings" onclick="switchTab('settings')">
+        <span class="material-icons-round">tune</span>Settings
+      </button>
+    </div>
+
+    <!-- CONTROL TAB -->
+    <div class="tab-content active" id="tab-control">
+
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">open_with</span>
+          <span>Movement</span>
+        </div>
+        <div class="dpad-container">
+          <div class="dpad-row">
+            <div class="dpad-spacer"></div>
+            <button class="dpad-btn" id="btnFwd" onpointerdown="sendCmd('F')" onpointerup="sendCmd('S')">
+              <span class="material-icons-round">arrow_upward</span>
+            </button>
+            <div class="dpad-spacer"></div>
+          </div>
+          <div class="dpad-row">
+            <button class="dpad-btn" id="btnLeft" onpointerdown="sendCmd('L')" onpointerup="sendCmd('S')">
+              <span class="material-icons-round">arrow_back</span>
+            </button>
+            <button class="dpad-btn dpad-center" id="btnStop" onpointerdown="sendCmd('S')">
+              <span class="material-icons-round">stop_circle</span>
+            </button>
+            <button class="dpad-btn" id="btnRight" onpointerdown="sendCmd('R')" onpointerup="sendCmd('S')">
+              <span class="material-icons-round">arrow_forward</span>
+            </button>
+          </div>
+          <div class="dpad-row">
+            <div class="dpad-spacer"></div>
+            <button class="dpad-btn" id="btnBack" onpointerdown="sendCmd('B')" onpointerup="sendCmd('S')">
+              <span class="material-icons-round">arrow_downward</span>
+            </button>
+            <div class="dpad-spacer"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card auto-card">
+        <div class="section-header">
+          <span class="material-icons-round">radar</span>
+          <span>Autonomous Mode</span>
+          <span class="auto-status" id="autoStatus">OFF</span>
+        </div>
+        <button class="auto-toggle-btn" id="autoBtn" onclick="toggleAutonomous()">
+          <div class="auto-toggle-inner">
+            <span class="material-icons-round auto-icon">smart_toy</span>
+            <div class="auto-label">
+              <span class="auto-title" id="autoTitle">Obstacle Avoidance</span>
+              <span class="auto-sub" id="autoSub">Tap to enable autonomous walking</span>
+            </div>
+          </div>
+          <div class="auto-switch" id="autoSwitch">
+            <div class="auto-switch-knob"></div>
+          </div>
+        </button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">animation</span>
+          <span>Actions</span>
+        </div>
+        <div class="action-grid">
+          <button class="action-btn stand" onclick="sendCmd('1')">
+            <span class="material-icons-round">accessibility_new</span>Stand
+          </button>
+          <button class="action-btn sit" onclick="sendCmd('2')">
+            <span class="material-icons-round">event_seat</span>Sit
+          </button>
+          <button class="action-btn wave" onclick="sendCmd('3')">
+            <span class="material-icons-round">waving_hand</span>Wave
+          </button>
+          <button class="action-btn shake" onclick="sendCmd('4')">
+            <span class="material-icons-round">handshake</span>Shake
+          </button>
+          <button class="action-btn dance" onclick="sendCmd('5')">
+            <span class="material-icons-round">music_note</span>Dance
+          </button>
+          <button class="action-btn headup" onclick="sendCmd('6')">
+            <span class="material-icons-round">north</span>Head Up
+          </button>
+          <button class="action-btn headdn" onclick="sendCmd('7')">
+            <span class="material-icons-round">south</span>Head Down
+          </button>
+          <button class="action-btn bodyl" onclick="sendCmd('8')">
+            <span class="material-icons-round">west</span>Body L
+          </button>
+          <button class="action-btn bodyr" onclick="sendCmd('9')">
+            <span class="material-icons-round">east</span>Body R
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">speed</span>
+          <span>Speed</span>
+          <span class="speed-val" id="speedVal">50%</span>
+        </div>
+        <div class="slider-container">
+          <span class="material-icons-round slider-icon">slow_motion_video</span>
+          <input type="range" id="speedSlider" min="1" max="100" value="50" oninput="updateSpeed(this.value)">
+          <span class="material-icons-round slider-icon">speed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMERA TAB -->
+    <div class="tab-content" id="tab-camera">
+      <div class="section-card camera-card">
+        <div class="section-header">
+          <span class="material-icons-round">linked_camera</span>
+          <span>ESP32-CAM Stream</span>
+        </div>
+        <div class="cam-input-row">
+          <div class="cam-input-wrap">
+            <span class="material-icons-round input-icon">link</span>
+            <input type="text" id="camUrl" placeholder="http://192.168.1.100:81/stream" spellcheck="false">
+          </div>
+          <button class="cam-connect-btn" id="camConnectBtn" onclick="toggleStream()">
+            <span class="material-icons-round">play_arrow</span>
+          </button>
+        </div>
+        <div class="cam-viewport" id="camViewport">
+          <div class="cam-placeholder" id="camPlaceholder">
+            <span class="material-icons-round cam-ph-icon">videocam_off</span>
+            <p>Enter ESP32-CAM IP and press play</p>
+            <p class="cam-ph-sub">e.g. http://192.168.1.100:81/stream</p>
+          </div>
+          <img id="camFeed" src="" alt="Camera Stream" style="display:none;">
+        </div>
+        <div class="cam-controls">
+          <button class="cam-ctrl-btn" onclick="toggleFullscreen()">
+            <span class="material-icons-round">fullscreen</span>
+          </button>
+          <button class="cam-ctrl-btn" onclick="captureSnapshot()">
+            <span class="material-icons-round">photo_camera</span>
+          </button>
+          <button class="cam-ctrl-btn" onclick="rotateStream()">
+            <span class="material-icons-round">rotate_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">info</span>
+          <span>Quick Setup</span>
+        </div>
+        <div class="info-steps">
+          <div class="step"><span class="step-num">1</span>Power on ESP32-CAM module</div>
+          <div class="step"><span class="step-num">2</span>Connect your phone to the same WiFi</div>
+          <div class="step"><span class="step-num">3</span>Enter the camera stream URL above</div>
+          <div class="step"><span class="step-num">4</span>Tap play to start live feed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tab-settings">
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">bluetooth</span>
+          <span>Bluetooth</span>
+        </div>
+        <button class="bt-connect-btn" id="btBtn" onclick="toggleBluetooth()">
+          <span class="material-icons-round">bluetooth_searching</span>
+          Connect HC-05
+        </button>
+        <div class="bt-info" id="btInfo">Not connected</div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">terminal</span>
+          <span>Serial Monitor</span>
+        </div>
+        <div class="serial-box" id="serialBox"></div>
+        <div class="serial-input-row">
+          <input type="text" id="serialInput" placeholder="Send command..." onkeydown="if(event.key==='Enter')sendSerial()">
+          <button class="serial-send-btn" onclick="sendSerial()">
+            <span class="material-icons-round">send</span>
+          </button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <span class="material-icons-round">code</span>
+          <span>Command Map</span>
+        </div>
+        <div class="cmd-table">
+          <div class="cmd-row"><span class="cmd-key">F</span><span>Forward</span></div>
+          <div class="cmd-row"><span class="cmd-key">B</span><span>Backward</span></div>
+          <div class="cmd-row"><span class="cmd-key">L</span><span>Turn Left</span></div>
+          <div class="cmd-row"><span class="cmd-key">R</span><span>Turn Right</span></div>
+          <div class="cmd-row"><span class="cmd-key">S</span><span>Stop</span></div>
+          <div class="cmd-row"><span class="cmd-key">1</span><span>Stand</span></div>
+          <div class="cmd-row"><span class="cmd-key">2</span><span>Sit</span></div>
+          <div class="cmd-row"><span class="cmd-key">3</span><span>Wave</span></div>
+          <div class="cmd-row"><span class="cmd-key">4</span><span>Shake</span></div>
+          <div class="cmd-row"><span class="cmd-key">5</span><span>Dance</span></div>
+          <div class="cmd-row"><span class="cmd-key">6</span><span>Head Up</span></div>
+          <div class="cmd-row"><span class="cmd-key">7</span><span>Head Down</span></div>
+          <div class="cmd-row"><span class="cmd-key">8</span><span>Body Left</span></div>
+          <div class="cmd-row"><span class="cmd-key">9</span><span>Body Right</span></div>
+          <div class="cmd-row"><span class="cmd-key">A</span><span>Autonomous (Obstacle Avoidance)</span></div>
+          <div class="cmd-row"><span class="cmd-key">M</span><span>Manual Mode</span></div>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="snapCanvas" style="display:none;"></canvas>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
